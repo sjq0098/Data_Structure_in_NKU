@@ -16,35 +16,61 @@ public:
 	void addEdge(int i,int j){
 		adjM[i][j]=adjM[j][i]=1;
 	}
-	vector<vector<int>> tcClosure(){
-		vector<vector<int>>closure=adjM;
-		for(int i=0;i<num;i++){
-			closure[i][i]=1;
-			vector<bool>isvisited(num,0);
+	
+	
+	
+	vector<vector<int>> tcClosure() {
+		vector<vector<int>> closure(num, vector<int>(num, 0));
+		unordered_map<int, bool> componentLabel;
+		
+		for(int i = 0; i < num; i++){
+			if (componentLabel.find(i)!= componentLabel.end() && componentLabel[i]) {
+				continue; 
+			}
+			
+			
+			vector<bool> isvisited(num, false);
 			queue<int> q;
 			q.push(i);
-			isvisited[i]=1;
+			isvisited[i] = true;
+			O++;
 			while(!q.empty()){
-				int curr=q.front();
+				int curr = q.front();
 				q.pop();
-				for(int j=0;j<num;j++){
-					if(adjM[curr][j]&&!isvisited[j]){
+				for(int j = 0; j < num; j++){
+					if(adjM[curr][j] && !isvisited[j]){
 						isvisited[j] = true;
-						closure[i][j] = 1;
 						O++;
 						q.push(j);
 					}
 				}
 			}
+			
+			
+			vector<int> component;
+			for(int k = 0; k < num; k++) {
+				if(isvisited[k]) {
+					component.push_back(k);
+					componentLabel[k] = true; 
+				}
+			}
+			
+			
+			for(auto &k : component){
+				for(auto &j : component){
+					closure[k][j] = 1;
+				}
+			}
 		}
 		return closure;
 	}
+	
 };
 void printMatrix(const vector<vector<int>> &matrix) {
 	int n = matrix.size();
 	cout << "    ";
-	for(int j = 1; j <= n; ++j){
-		cout << j << " ";
+	for(int j = 0; j < n; ++j){
+		cout << (j+1) << " ";
 	}
 	cout << endl;
 	cout << "   ";
@@ -52,24 +78,27 @@ void printMatrix(const vector<vector<int>> &matrix) {
 		cout << "--";
 	}
 	cout << endl;
-	for(int i = 1; i <= n; ++i){
-		cout << i << " | ";
+	for(int i = 0; i < n; ++i){
+		cout << (i+1) << " | ";
 		for(int j = 0; j < n; ++j){
-			cout << matrix[i-1][j] << " ";
+			cout << matrix[i][j] << " ";
 		}
 		cout << endl;
 	}
 }
+
 int main(){
+// 定义顶点数量
+	int vertices = 4;
+	graph g(vertices);
 
-	graph g(7);
-
-	for(int i=0;i<5;i++){
-		for(int j=i+1;j<5;j++){
-			g.addEdge(i,j);
-		}
-	}
-
+	g.addEdge(0, 1);
+	g.addEdge(0, 2);
+	g.addEdge(1, 2);
+	g.addEdge(2, 0);
+	g.addEdge(2, 3);
+	g.addEdge(3, 3);
+	
 	cout << "邻接矩阵：" << endl;
 	printMatrix(g.adjM);
 	
